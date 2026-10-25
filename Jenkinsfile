@@ -229,7 +229,7 @@ pipeline {
         }
 
         stage('Manual Rollback') {
-            when { expression { params.ROLLBACK == true } }
+            when { expression { params.ROLLBACK == true } }o
             steps {
                 script {
                     echo 'Manual rollback triggered...'
@@ -257,7 +257,7 @@ pipeline {
         success {
             echo '🎉 All stages completed successfully!'
             mail(
-                to: 'darosamakypro@gmail.com',
+                to: 'mohammedsoumare25@gmail.com',
                 subject: "✅ SUCCESS: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
                 body: """
                     Build réussi avec succès !
@@ -280,7 +280,7 @@ pipeline {
         failure {
             echo '❌ Pipeline failed! Check logs above.'
             mail(
-                to: 'darosamakypro@gmail.com',
+                to: 'mohammedsoumare25@gmail.com',
                 subject: "❌ FAILURE: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
                 body: """
                     Build échoué !
