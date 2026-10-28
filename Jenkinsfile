@@ -25,7 +25,7 @@ pipeline {
         stage('Checkout Git') {
             when { expression { params.ROLLBACK == false } }
             steps {
-                sh 'docker network connect safe-zone_buy-net buy-01-jenkins-1 || true'
+                sh 'docker network connect buy02-runtime_buy-net buy02-runtime-jenkins-1 || true'
                 echo 'Git Checkout in Progress...'
                 checkout scm
                 sh 'ls -la'
@@ -49,7 +49,7 @@ pipeline {
             steps {
                 script {
                     echo 'Starting MongoDB...'
-                    sh 'docker compose -p buy-01 up -d mongo'
+                    sh 'docker compose -p buy02-runtime up -d mongo'
                     sh 'docker ps | grep mongo || (echo "MongoDB failed to start" && exit 1)'
                 }
             }
@@ -197,7 +197,7 @@ pipeline {
                 script {
                     echo '🚀 Starting deployment process...'
                     
-                    sh 'docker images --format "{{.Repository}}:{{.Tag}}" | grep buy-01 | grep \':latest$\' > /tmp/current_images.txt || true'
+                    sh 'docker images --format "{{.Repository}}:{{.Tag}}" | grep buy02-runtime | grep \':latest$\' > /tmp/current_images.txt || true'
                     sh '''
                     for img in $(cat /tmp/current_images.txt); do
                         base_img=$(echo "$img" | cut -d':' -f1)
@@ -207,20 +207,20 @@ pipeline {
                     '''
                     
                     try {
-                        sh 'docker compose -p buy-01 build frontend user-service product-service media-service order-service cart-service'
-                        sh 'docker compose -p buy-01 up -d --force-recreate frontend user-service product-service media-service order-service cart-service'
+                        sh 'docker compose -p buy02-runtime build frontend user-service product-service media-service order-service cart-service'
+                        sh 'docker compose -p buy02-runtime up -d --force-recreate frontend user-service product-service media-service order-service cart-service'
                         sh 'echo "Waiting for services to stabilize..." && sleep 10'
                         
                     } catch (Exception e) {
                         echo '❌ Error detected, rollback starting...'
                         sh '''
                             for service in frontend user-service product-service media-service order-service cart-service; do
-                                if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "buy-01-${service}:latest-backup"; then
-                                    docker tag buy-01-${service}:latest-backup buy-01-${service}:latest
-                                    echo "Restored buy-01-${service}"
+                                if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "buy02-runtime-${service}:latest-backup"; then
+                                    docker tag buy02-runtime-${service}:latest-backup buy02-runtime-${service}:latest
+                                    echo "Restored buy02-runtime-${service}"
                                 fi
                             done
-                            docker compose -p buy-01 up -d --force-recreate frontend user-service product-service media-service order-service cart-service
+                            docker compose -p buy02-runtime up -d --force-recreate frontend user-service product-service media-service order-service cart-service
                         '''
                         error('Deployment failed and rollback executed. Check logs for details.')
                     }
@@ -235,13 +235,13 @@ pipeline {
                     echo 'Manual rollback triggered...'
                     sh '''
                         for service in frontend user-service product-service media-service order-service cart-service; do
-                            if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "buy-01-${service}:latest-backup"; then
-                                docker tag buy-01-${service}:latest-backup buy-01-${service}:latest
-                                echo "Restored buy-01-${service}"
+                            if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "buy02-runtime-${service}:latest-backup"; then
+                                docker tag buy02-runtime-${service}:latest-backup buy02-runtime-${service}:latest
+                                echo "Restored buy02-runtime-${service}"
 
                             fi
                         done
-                        docker compose -p buy-01 up -d --force-recreate frontend user-service product-service media-service order-service cart-service
+                        docker compose -p buy02-runtime up -d --force-recreate frontend user-service product-service media-service order-service cart-service
                     '''
                     echo '✅ Rollback completed. Services should be restored to previous stable versions.'
                 }
@@ -252,7 +252,7 @@ pipeline {
     post {
         always {
             echo "📊 Pipeline execution finished. Status: ${currentBuild.currentResult}"
-            junit '**/target/surefire-reports/*.xml'
+            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
         }
         success {
             echo '🎉 All stages completed successfully!'
