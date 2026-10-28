@@ -179,7 +179,7 @@ pipeline {
             when { expression { params.ROLLBACK == false } }
             steps {
                 dir('frontend') {
-                    sh 'npm ci --unsafe-perm'
+                    sh 'npm ci --no-audit --no-fund'
                     sh 'npx puppeteer browsers install chrome'
                     sh 'npm run build'
                     sh 'export CI=true && npm test -- --project=buy-frontend --code-coverage --no-watch'
