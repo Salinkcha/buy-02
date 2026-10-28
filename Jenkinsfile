@@ -180,9 +180,9 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'PUPPETEER_SKIP_DOWNLOAD=true npm ci --no-audit --no-fund'
-                    sh 'rm -rf .puppeteer-cache && PUPPETEER_CACHE_DIR="$PWD/.puppeteer-cache" npx puppeteer browsers install chrome'
+                    sh 'command -v chromium && test -x "$(command -v chromium)"'
                     sh 'npm run build'
-                    sh 'export CI=true PUPPETEER_CACHE_DIR="$PWD/.puppeteer-cache" && npm test -- --project=buy-frontend --code-coverage --no-watch'
+                    sh 'export CI=true CHROME_BIN="$(command -v chromium)" && npm test -- --project=buy-frontend --code-coverage --no-watch'
                     withSonarQubeEnv('sonarqube') {
                         sh 'npx sonarqube-scanner -Dsonar.projectKey=buy-02-front -Dsonar.projectName="buy-02-front" -Dsonar.sources=src -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts -Dsonar.javascript.lcov.reportPaths=coverage/buy-frontend/lcov.info'
                     }

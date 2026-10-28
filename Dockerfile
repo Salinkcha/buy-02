@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     libxss1 \
     libxtst6 \
+    chromium \
     xdg-utils \
     curl
 
