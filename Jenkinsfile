@@ -229,7 +229,7 @@ pipeline {
         }
 
         stage('Manual Rollback') {
-            when { expression { params.ROLLBACK == true } }o
+            when { expression { params.ROLLBACK == true } }
             steps {
                 script {
                     echo 'Manual rollback triggered...'
