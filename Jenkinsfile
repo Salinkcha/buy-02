@@ -180,7 +180,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm ci --unsafe-perm'
-                    sh 'npx puppeteer install'
+                    sh 'npx puppeteer browsers install chrome'
                     sh 'npm run build'
                     sh 'export CI=true && npm test -- --project=buy-frontend --code-coverage --no-watch'
                     withSonarQubeEnv('sonarqube') {
