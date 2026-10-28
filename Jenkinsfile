@@ -256,50 +256,9 @@ pipeline {
         }
         success {
             echo '🎉 All stages completed successfully!'
-            mail(
-                to: 'mohammedsoumare25@gmail.com',
-                subject: "✅ SUCCESS: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                body: """
-                    Build réussi avec succès !
-                    
-                    Dashboards SonarQube :
-                    - User Service : http://sonarqube:9000/dashboard?id=buy-02-user
-                    - Product Service : http://sonarqube:9000/dashboard?id=buy-02-product
-                    - Media Service : http://sonarqube:9000/dashboard?id=buy-02-media
-                    - Order Service : http://sonarqube:9000/dashboard?id=buy-02-order
-                    - Cart Service : http://sonarqube:9000/dashboard?id=buy-02-cart
-                    - Frontend : http://sonarqube:9000/dashboard?id=buy-02-front
-                    
-                    Job: ${env.JOB_NAME}
-                    Build #: ${env.BUILD_NUMBER}
-                    URL: ${env.BUILD_URL}
-                    Durée: ${currentBuild.durationString}
-                """
-            )
         }
         failure {
             echo '❌ Pipeline failed! Check logs above.'
-            mail(
-                to: 'mohammedsoumare25@gmail.com',
-                subject: "❌ FAILURE: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                body: """
-                    Build échoué !
-                    Le pipeline a bloqué durant l'analyse du service : ${env.CURRENT_SERVICE ?: 'Initialisation / Tests'}
-                    
-                    Liens directs SonarQube pour vérification :
-                    - User Service : http://sonarqube:9000/dashboard?id=buy-02-user
-                    - Product Service : http://sonarqube:9000/dashboard?id=buy-02-product
-                    - Media Service : http://sonarqube:9000/dashboard?id=buy-02-media
-                    - Order Service : http://sonarqube:9000/dashboard?id=buy-02-order
-                    - Cart Service : http://sonarqube:9000/dashboard?id=buy-02-cart
-                    - Frontend : http://sonarqube:9000/dashboard?id=buy-02-front
-                    
-                    Job: ${env.JOB_NAME}
-                    Build #: ${env.BUILD_NUMBER}
-                    URL: ${env.BUILD_URL}
-                    État: ${currentBuild.currentResult}
-                """
-            )
         }
     }
 }
